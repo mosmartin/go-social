@@ -4,6 +4,9 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 type app struct {
@@ -14,20 +17,32 @@ type config struct {
 	addr string
 }
 
-func (a *app) mount() *http.ServeMux {
-	mux := http.NewServeMux()
+func (a *app) mount() http.Handler {
+	r := chi.NewRouter()
 
-	mux.HandleFunc("GET /api/v1/health", a.healthCheckHandler)
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
-	return mux
+	// Set a timeout value on the request context (ctx), that will signal
+	// through ctx.Done() that the request has timed out and further
+	// processing should be stopped.
+	r.Use(middleware.Timeout(60 * time.Second))
+
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Get("/health", a.healthCheckHandler)
+	})
+
+	return r
 }
 
-func (a *app) run(mux *http.ServeMux) error {
+func (a *app) run(mux http.Handler) error {
 	srv := &http.Server{
 		Addr:         a.config.addr,
 		Handler:      mux,
-		WriteTimeout: time.Second * 30,
-		ReadTimeout:  time.Second * 10,
+		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  10 * time.Second,
 		IdleTimeout:  time.Minute,
 	}
 
