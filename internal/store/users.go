@@ -15,7 +15,6 @@ type User struct {
 	Email     string `json:"email"`
 	Password  string `json:"-"`
 	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
 }
 
 func (us *UserStore) Create(ctx context.Context, user *User) error {
@@ -33,7 +32,6 @@ func (us *UserStore) Create(ctx context.Context, user *User) error {
 	).Scan(
 		&user.ID,
 		&user.CreatedAt,
-		&user.UpdatedAt,
 	)
 	if err != nil {
 		return err

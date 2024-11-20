@@ -18,7 +18,6 @@ type Post struct {
 	UserID    int64    `json:"user_id"`
 	Tags      []string `json:"tags"`
 	CreatedAt string   `json:"created_at"`
-	UpdatedAt string   `json:"updated_at"`
 }
 
 func (ps *PostStore) Create(ctx context.Context, post *Post) error {
@@ -37,7 +36,6 @@ func (ps *PostStore) Create(ctx context.Context, post *Post) error {
 	).Scan(
 		&post.ID,
 		&post.CreatedAt,
-		&post.UpdatedAt,
 	)
 	if err != nil {
 		return err
