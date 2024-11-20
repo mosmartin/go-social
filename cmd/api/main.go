@@ -9,6 +9,8 @@ import (
 	"github.com/mosmartin/go-social/internal/store"
 )
 
+const version = "0.0.1"
+
 func main() {
 	cfg := config{
 		addr: env.GetStringEnv("ADDR", ":8080"),
@@ -18,6 +20,7 @@ func main() {
 			maxIdleConns: env.GetIntEnv("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetStringEnv("DB_MAX_IDLE_TIME", "15m"),
 		},
+		env: env.GetStringEnv("ENV", "development"),
 	}
 
 	db, err := db.New(
